@@ -4,7 +4,7 @@
  * @Github: https://github.com/qingfuliu
  * @Date: 2022-03-21 15:09:36
  * @LastEditors: qingfu liu
- * @LastEditTime: 2022-03-21 20:20:35
+ * @LastEditTime: 2022-03-21 21:13:31
  * @FilePath: \golang\Gee\gee\context.go
  * @Description:
  */
@@ -23,12 +23,19 @@ type Context struct {
 	Req          *http.Request
 	Path, Method string
 	StatusCode   int
+	index        int
+	handles      []HandleFunc
 }
 
 func newContext(w http.ResponseWriter, r *http.Request) *Context {
-	return &Context{Writer: w, Req: r, Path: r.URL.Path, Method: r.Method}
+	return &Context{Writer: w, Req: r, Path: r.URL.Path, Method: r.Method, index: -1, handles: make([]HandleFunc, 0)}
 }
-
+func (c *Context) next() {
+	s := len(c.handles)
+	for ; c.index < s; c.index++ {
+		c.handles[c.index](c)
+	}
+}
 func (c *Context) PostForm(key string) string {
 	return c.Req.FormValue(key)
 }

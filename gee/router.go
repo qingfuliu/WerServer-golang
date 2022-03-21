@@ -4,7 +4,7 @@
  * @Github: https://github.com/qingfuliu
  * @Date: 2022-03-21 15:24:33
  * @LastEditors: qingfu liu
- * @LastEditTime: 2022-03-21 20:20:57
+ * @LastEditTime: 2022-03-21 21:19:26
  * @FilePath: \golang\Gee\gee\router.go
  * @Description:
  */
@@ -142,8 +142,9 @@ func (r *router) deleteRoute(method, pattern string) {
 func (r *router) handle(c *Context) {
 	key := c.Method + "/" + c.Path
 	if handler, ok := r.trieNode.search(key); ok {
-		handler(c)
+		c.handles = append(c.handles, handler)
 	} else {
 		c.String(404, "404 NOT FOUND :%s", key)
 	}
+	c.next()
 }
